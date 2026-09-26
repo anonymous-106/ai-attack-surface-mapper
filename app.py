@@ -1,33 +1,25 @@
+import argparse
+from config import Config
 from core.target import create_target
 from core.validator import validate_target
-from models.target import Target, TargetType
+from models.target import TargetType
 
 
 def main():
-    # Valid target
-    valid_target = create_target(
-        identifier="example.com",
+    parser = argparse.ArgumentParser( prog="AI Attack Surface Mapper", description="AI Attack Surface Mapper - Attack surface discovery and mapping tool.")
+    parser.add_argument("--target", required=True, help = "Target to assess")
+    args = parser.parse_args()
+
+    target = create_target(
+        identifier=args.target,
         target_type=TargetType.DOMAIN,
-        scope=("example.com",)
+        scope=(args.target,)
     )
 
-    # Target that is outside the declared scope
-    out_of_scope_target = Target(
-        identifier="api.example.com",
-        target_type=TargetType.DOMAIN,
-        scope=("example.com",)
-    )
-
-    # Target with no scope
-    no_scope_target = Target(
-        identifier="example.com",
-        target_type=TargetType.DOMAIN,
-        scope=()
-    )
-
-    print("Valid target:", validate_target(valid_target))
-    print("Out of scope:", validate_target(out_of_scope_target))
-    print("No scope:", validate_target(no_scope_target))
+    if validate_target(target):
+        print("Target accepted:", target.identifier)
+    else:
+        print("Target rejected.")
 
 
 if __name__ == "__main__":
