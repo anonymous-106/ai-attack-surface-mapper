@@ -1,6 +1,6 @@
 from models.target import Target
 from recon.base import ReconModule
-from recon.result import ReconResults
+from recon.result import ReconResult
 
 class ReconFramework:
     """
