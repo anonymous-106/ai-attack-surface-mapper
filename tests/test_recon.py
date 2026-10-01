@@ -37,5 +37,5 @@ def test_module_execution():
 
     assert len(results) == 1
     assert results[0].success is True
-    assert results[0].module == "dummy"
+    assert results[0].module == "Dummy"
     assert results[0].target == "example.com"
