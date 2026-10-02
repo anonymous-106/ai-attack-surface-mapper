@@ -4,10 +4,10 @@ from recon.result import ReconResult
 from recon.framework import ReconFramework
 
 
-class DummyRecoveryModule(ReconModule):
+class DummyReconModule(ReconModule):
     @property
     def name(self) -> str:
-        return "Dummy"
+        return "dummy"
     def run(self, target: Target) -> ReconResult:
         return ReconResult(
             module=self.name,
@@ -16,16 +16,23 @@ class DummyRecoveryModule(ReconModule):
             data={"info": "Dummy Reconnaissance executed successfully."},
         )
 
+class FailingReconModule(ReconModule):
+    @property
+    def name(self) -> str:
+        return "failing"
+    def run(self, target: Target) -> ReconResult:
+        raise RuntimeError("Simulated Reconnaissance Failure.")
+
 def test_module_registration():
     framework = ReconFramework()
-    module = DummyRecoveryModule()
+    module = DummyReconModule()
 
     framework.register(module)
     assert module in framework.modules
 
 def test_module_execution():
     framework = ReconFramework()
-    framework.register(DummyRecoveryModule())
+    framework.register(DummyReconModule())
 
     target = Target(
         identifier="example.com",
@@ -37,5 +44,26 @@ def test_module_execution():
 
     assert len(results) == 1
     assert results[0].success is True
-    assert results[0].module == "Dummy"
+    assert results[0].module == "dummy"
     assert results[0].target == "example.com"
+
+def test_module_failure_isolated():
+    framework = ReconFramework()
+    framework.register(FailingReconModule())
+    framework.register(DummyReconModule())
+
+    target = Target(
+        identifier="example.com",
+        target_type=TargetType.DOMAIN,
+        scope=("example.com",),
+    )
+
+    results = framework.run(target)
+
+    assert len(results) == 2
+
+    assert results[0].success is False
+    assert results[0].module == "failing"
+
+    assert results[1].success is True
+    assert results[1].module == "dummy"
