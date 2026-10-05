@@ -67,3 +67,19 @@ def test_module_failure_isolated():
 
     assert results[1].success is True
     assert results[1].module == "dummy"
+def test_invalid_target_is_rejected():
+    framework = ReconFramework()
+    framework.register(DummyReconModule())
+
+    target = Target(
+        identifier="outside.example.com",
+        target_type=TargetType.DOMAIN,
+        scope=("example.com",),
+    )
+
+    results = framework.run(target)
+
+    assert len(results) == 1
+    assert results[0].success is False
+    assert results[0].module == "framework"
+    assert results[0].error == "Target validation failed"
