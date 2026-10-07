@@ -34,6 +34,10 @@ class ReconFramework:
         for module in self.modules:
             try:
                 result = module.run(target)
+                if not isinstance(result, ReconResult):
+                    raise TypeError(
+                        f"Recon module '{module.name}' returned an invalid result"
+                    )
                 results.append(result)
 
             except Exception as error:

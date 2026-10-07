@@ -23,6 +23,15 @@ class FailingReconModule(ReconModule):
     def run(self, target: Target) -> ReconResult:
         raise RuntimeError("Simulated Reconnaissance Failure.")
 
+class InvalidResultReconModule(ReconModule):
+
+    @property
+    def name(self) -> str:
+        return "invalid-result"
+
+    def run(self, target: Target):
+        return "this is not a ReconResult"
+
 def test_module_registration():
     framework = ReconFramework()
     module = DummyReconModule()
@@ -83,3 +92,20 @@ def test_invalid_target_is_rejected():
     assert results[0].success is False
     assert results[0].module == "framework"
     assert results[0].error == "Target validation failed"
+
+def test_invalid_module_result_is_handled():
+    framework = ReconFramework()
+    framework.register(InvalidResultReconModule())
+
+    target = Target(
+        identifier="example.com",
+        target_type=TargetType.DOMAIN,
+        scope=("example.com",),
+    )
+
+    results = framework.run(target)
+
+    assert len(results) == 1
+    assert results[0].success is False
+    assert results[0].module == "invalid-result"
+    assert "invalid result" in results[0].error
