@@ -32,6 +32,23 @@ class InvalidResultReconModule(ReconModule):
     def run(self, target: Target):
         return "this is not a ReconResult"
 
+class WrongTargetReconModule(ReconModule):
+
+    @property
+    def name(self) -> str:
+        return "wrong-target"
+
+    def run(self, target: Target) -> ReconResult:
+        return ReconResult(
+            module=self.name,
+            target="wrong.example.com",
+            success=True,
+            data={"message": "Test result"},
+        )
+
+
+
+
 def test_module_registration():
     framework = ReconFramework()
     module = DummyReconModule()
@@ -109,3 +126,20 @@ def test_invalid_module_result_is_handled():
     assert results[0].success is False
     assert results[0].module == "invalid-result"
     assert "invalid result" in results[0].error
+
+
+def test_result_target_matches_framework_target():
+    framework = ReconFramework()
+    framework.register(WrongTargetReconModule())
+
+    target = Target(
+        identifier="example.com",
+        target_type=TargetType.DOMAIN,
+        scope=("example.com",),
+    )
+
+    results = framework.run(target)
+
+    assert len(results) == 1
+    assert results[0].success is True
+    assert results[0].target == "example.com"

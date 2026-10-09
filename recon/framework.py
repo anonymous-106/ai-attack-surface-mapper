@@ -38,6 +38,7 @@ class ReconFramework:
                     raise TypeError(
                         f"Recon module '{module.name}' returned an invalid result"
                     )
+                result.target = target.identifier
                 results.append(result)
 
             except Exception as error:
