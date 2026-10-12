@@ -1,7 +1,12 @@
+
+import logging
+
+from core.validator import validate_target
 from models.target import Target
 from recon.base import ReconModule
 from recon.result import ReconResult
-from core.validator import validate_target
+
+logger = logging.getLogger(__name__)
 
 
 class ReconFramework:
@@ -32,8 +37,14 @@ class ReconFramework:
         results = []
 
         for module in self.modules:
+            logger.info(
+                "Starting reconnaissance module: %s",
+                module.name,
+            )
+
             try:
                 result = module.run(target)
+
                 if not isinstance(result, ReconResult):
                     raise TypeError(
                         f"Recon module '{module.name}' returned an invalid result"
@@ -41,10 +52,21 @@ class ReconFramework:
                 result.target = target.identifier
                 results.append(result)
 
+                logger.info(
+                    "Reconnaissance module completed: %s",
+                    module.name,
+                )
+
             except Exception as error:
+                logger.error(
+                    "Reconnaissance module failed: %s (%s)",
+                    module.name,
+                    type(error).__name__,
+                )
+
                 results.append(
                     ReconResult(
-                    module=module.name,
+                        module=module.name,
                         target=target.identifier,
                         success=False,
                         error=str(error),
