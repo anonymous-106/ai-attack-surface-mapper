@@ -1,1 +1,2 @@
 pytest>=9.1,<10
+dnspython>=2.7,<3
