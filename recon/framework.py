@@ -25,15 +25,19 @@ class ReconFramework:
         """Execute all registered reconnaissance modules."""
 
         if not validate_target(target):
+            target_identifier = (
+                target.identifier if isinstance(target, Target) else "unknown"
+            )
             return [
                 ReconResult(
                     module="framework",
-                    target=target.identifier,
+                    target=target_identifier,
                     success=False,
                     error="Target validation failed",
                 )
-            ]
-
+        ]
+        
+    
         results = []
 
         for module in self.modules:

@@ -1,9 +1,18 @@
+
 import logging
+
 from models.target import Target, TargetType
 
 logger = logging.getLogger(__name__)
 
+
 def validate_target(target: Target) -> bool:
+    """Validate a target object and its declared scope."""
+
+    if not isinstance(target, Target):
+        logger.warning("Target rejected: invalid target object")
+        return False
+
     if not target.identifier:
         logger.warning("Target rejected: empty identifier")
         return False

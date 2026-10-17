@@ -143,3 +143,15 @@ def test_result_target_matches_framework_target():
     assert len(results) == 1
     assert results[0].success is True
     assert results[0].target == "example.com"
+
+
+def test_missing_target_is_rejected():
+    framework = ReconFramework()
+    framework.register(DummyReconModule())
+
+    results = framework.run(None)
+
+    assert len(results) == 1
+    assert results[0].success is False
+    assert results[0].module == "framework"
+    assert results[0].error == "Target validation failed"
