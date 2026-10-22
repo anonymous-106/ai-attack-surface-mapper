@@ -44,3 +44,21 @@ def test_dns_module_collects_a_record():
     assert result.module  == "dns"
     assert result.target == "example.com"
 
+def test_dns_module_handles_timeout():
+    import dns.exception
+
+    resolver = MagicMock()
+    resolver.resolve.side_effect = dns.exception.Timeout
+
+    module = DNSReconModule(resolver=resolver)
+
+    target = Target(
+        identifier="example.com",
+        target_type=TargetType.DOMAIN,
+        scope=("example.com",),
+    )
+
+    result = module.run(target)
+
+    assert result.success is False
+    assert result.data["failures"]["A"] == "No answer or timeout"
