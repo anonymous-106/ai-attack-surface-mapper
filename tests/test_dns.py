@@ -62,3 +62,22 @@ def test_dns_module_handles_timeout():
 
     assert result.success is False
     assert result.data["failures"]["A"] == "No answer or timeout"
+
+def test_dns_module_handles_nonexistent_domain():
+    import dns.resolver
+
+    resolver = MagicMock()
+    resolver.resolve.side_effect = dns.resolver.NXDOMAIN
+
+    module = DNSReconModule(resolver = resolver)
+
+    target = Target(
+        identifier="example.com",
+        target_type = TargetType.DOMAIN,
+        scope = ("example.com",),
+    )
+
+    result = module.run(target)
+
+    assert result.success is False
+    assert result.data["failures"]["A"] == "Name does not exist"
