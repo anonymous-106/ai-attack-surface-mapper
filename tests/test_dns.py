@@ -101,3 +101,25 @@ def test_dns_module_handles_no_nameservers():
 
     assert result.success is False
     assert result.data["failures"]["A"] == "No nameservers available"
+
+    def test_dns_module_handles_empty_dns_response():
+        resolver = MagicMock()
+
+        empty_response = MagicMock()
+        empty_response.rrset = None
+        resolver.resolve.return_value = empty_response
+
+        module = DNSReconModule(resolver=resolver)
+
+        target = Target(
+            identifier="example.com",
+            target_type=TargetType.DOMAIN,
+            scope=("example.com",),
+        )
+
+        result = module.run(target)
+
+        assert result.success is False
+        assert result.data["records"]["A"] == []
+        assert result.data["records"]["MX"] == []
+        assert result.data["failures"] == {}
