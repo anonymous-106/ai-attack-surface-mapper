@@ -28,6 +28,7 @@ class ReconFramework:
             target_identifier = (
                 target.identifier if isinstance(target, Target) else "unknown"
             )
+            
             return [
                 ReconResult(
                     module="framework",
@@ -37,7 +38,6 @@ class ReconFramework:
                 )
         ]
         
-    
         results = []
 
         for module in self.modules:

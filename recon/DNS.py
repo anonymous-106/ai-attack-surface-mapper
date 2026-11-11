@@ -14,7 +14,7 @@ class DNSReconModule(ReconModule):
     RECORD_TYPES = ("A", "AAAA", "CNAME", "MX", "NS", "TXT")
 
     def __init__(self, resolver=None):
-        self.resolver = resolver or dns.resolver.Resolver()
+        self.resolver = (resolver if resolver is not None else dns.resolver.Resolver())
         self.resolver.timeout = 2.0
         self.resolver.lifetime = 5.0
 

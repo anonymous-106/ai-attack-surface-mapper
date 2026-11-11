@@ -168,3 +168,5 @@ def test_invalid_target_object_is_rejected():
     assert results[0].module == "framework"
     assert results[0].target == "unknown"
     assert results[0].error == "Target validation failed"
+
+
